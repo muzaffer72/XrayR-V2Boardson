@@ -221,7 +221,7 @@ install_XrayR() {
 
     # 写入配置文件
     echo "Yapılandırma dosyası yazmaya çalışılıyor...."
-    wget https://cdn.jsdelivr.net/gh/muzaffer72/XrayR-V2Board/config.yml -O /etc/XrayR/config.yml
+    wget https://cdn.jsdelivr.net/gh/muzaffer72/XrayR-V2Boardson/config.yml -O /etc/XrayR/config.yml
     sed -i "s/NodeID:.*/NodeID: ${node_id}/g" /etc/XrayR/config.yml
     sed -i "s/NodeType:.*/NodeType: ${node_type}/g" /etc/XrayR/config.yml
     sed -i "s/CertDomain:.*/CertDomain: \"${node_domain}\"/g" /etc/XrayR/config.yml
