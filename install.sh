@@ -8,7 +8,7 @@ plain='\033[0m'
 cur_dir=$(pwd)
 
 # check root
-[[ $EUID -ne 0 ]] && echo -e "${red}错误：${plain} 必须使用root用户运行此脚本！\n" && exit 1
+[[ $EUID -ne 0 ]] && echo -e "${red}hata：${plain} root olarak çalıştırınız！\n" && exit 1
 
 # check os
 if [[ -f /etc/redhat-release ]]; then
@@ -26,7 +26,7 @@ elif cat /proc/version | grep -Eqi "ubuntu"; then
 elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
     release="centos"
 else
-    echo -e "${red}未检测到系统版本，请联系脚本作者！${plain}\n" && exit 1
+    echo -e "${red}Sistem sürümü algılanmadı, lütfen komut dosyası yazarıyla iletişime geçin！${plain}\n" && exit 1
 fi
 
 arch=$(arch)
@@ -111,13 +111,13 @@ install_XrayR() {
     if  [ $# == 0 ] ;then
         last_version=$(curl -Ls "https://api.github.com/repos/XrayR-project/XrayR/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
         if [[ ! -n "$last_version" ]]; then
-            echo -e "${red}检测 XrayR 版本失败，可能是超出 Github API 限制，请稍后再试，或手动指定 XrayR 版本安装${plain}"
+            echo -e "${red}XrayR sürümü algılanamadı, Github API sınırının ötesinde olabilir, lütfen daha sonra tekrar deneyin veya yüklenecek XrayR sürümünü manuel olarak belirtin${plain}"
             exit 1
         fi
         echo -e "检测到 XrayR 最新版本：${last_version}，开始安装"
         wget -q -N --no-check-certificate -O /usr/local/XrayR/XrayR-linux.zip https://github.com/XrayR-project/XrayR/releases/download/${last_version}/XrayR-linux-${arch}.zip
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}下载 XrayR 失败，请确保你的服务器能够下载 Github 的文件${plain}"
+            echo -e "${red}XrayR indirilemedi, lütfen sunucunuzun Github'dan dosya indirebildiğinden emin olun${plain}"
             exit 1
         fi
     else
@@ -127,10 +127,10 @@ install_XrayR() {
 	    last_version="v"$1
 	fi
         url="https://github.com/XrayR-project/XrayR/releases/download/${last_version}/XrayR-linux-${arch}.zip"
-        echo -e "开始安装 XrayR ${last_version}"
+        echo -e "kurulumu başlat XrayR ${last_version}"
         wget -q -N --no-check-certificate -O /usr/local/XrayR/XrayR-linux.zip ${url}
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}下载 XrayR ${last_version} 失败，请确保此版本存在${plain}"
+            echo -e "${red}indirilemedi XrayR ${last_version} Başarısız oldu, bu sürümün mevcut olduğundan emin olun${plain}"
             exit 1
         fi
     fi
@@ -146,23 +146,23 @@ install_XrayR() {
     systemctl daemon-reload
     systemctl stop XrayR
     systemctl enable XrayR
-    echo -e "${green}XrayR ${last_version}${plain} 安装完成，已设置开机自启"
+    echo -e "${green}XrayR ${last_version}${plain} Kurulum tamamlandı ve açılışta otomatik olarak başlayacak şekilde ayarlandı."
     cp geoip.dat /etc/XrayR/
     cp geosite.dat /etc/XrayR/ 
 
     if [[ ! -f /etc/XrayR/config.yml ]]; then
         cp config.yml /etc/XrayR/
         echo -e ""
-        echo -e "全新安装，请先参看教程：https://github.com/XrayR-project/XrayR，配置必要的内容"
+        echo -e "Yeni kurulum, lütfen önce öğreticiye bakın：https://github.com/XrayR-project/XrayR，Gerekli içeriği yapılandırın"
     else
         systemctl start XrayR
         sleep 2
         check_status
         echo -e ""
         if [[ $? == 0 ]]; then
-            echo -e "${green}XrayR 重启成功${plain}"
+            echo -e "${green}XrayR başarıyla yeniden başlatıldı ${plain}"
         else
-            echo -e "${red}XrayR 可能启动失败，请稍后使用 XrayR log 查看日志信息，若无法启动，则可能更改了配置格式，请前往 wiki 查看：https://github.com/XrayR-project/XrayR/wiki${plain}"
+            echo -e "${red}XrayR Başlatılamayabilir, lütfen daha sonra günlük bilgilerini görüntülemek için XrayR günlüğünü kullanın, başlatılamıyorsa, yapılandırma biçimi değiştirilmiş olabilir, lütfen kontrol etmek için wikiye gidin：https://github.com/XrayR-project/XrayR/wiki${plain}"
         fi
     fi
 
@@ -183,50 +183,50 @@ install_XrayR() {
     fi
 
      # 设置节点序号
-    echo "设定节点序号"
+    echo "Düğüm numarasını ayarla"
     echo ""
-    read -p "请输入V2Board中的节点序号:" node_id
+    read -p "Sunucu id giriniz:" node_id
     [ -z "${node_id}" ]
     echo "---------------------------"
-    echo "您设定的节点序号为 ${node_id}"
+    echo "Ayarladığınız sunucu id: ${node_id}"
     echo "---------------------------"
     echo ""
 
     # 选择协议
-    echo "选择节点类型(默认V2ray)"
+    echo "Sunucu türünü seçin (varsayılan V2ray)"
     echo ""
-    read -p "请输入你使用的协议(V2ray, Shadowsocks, Trojan):" node_type
+    read -p "Lütfen kullandığınız protokolü girin(V2ray, Shadowsocks, Trojan):" node_type
     [ -z "${node_type}" ]
     
-    # 如果不输入默认为V2ray
+    # Girilmezse, varsayılan V2ray'dir.
     if [ ! $node_type ]; then 
     node_type="V2ray"
     fi
 
     echo "---------------------------"
-    echo "您选择的协议为 ${node_type}"
+    echo "Seçtiğiniz protokol ${node_type}"
     echo "---------------------------"
     echo ""
 
     # 输入域名（TLS）
-    echo "输入你的域名"
+    echo "alan adınızı girin"
     echo ""
-    read -p "请输入你的域名(node.v2board.com)如没开启TLS请直接回车:" node_domain
+    read -p "Lütfen alan adınızı girin (sunucu.onvao.net) TLS etkin değilse, lütfen Enter'a basın:" node_domain
     [ -z "${node_domain}" ]
 
-    # 如果不输入默认为node1.v2board.com
+    # Varsayılan olarak  sunucu.onvao.net ayarlanacak
     if [ ! $node_domain ]; then 
-    node_domain="node.v2board.com"
+    node_domain="sunucu.onvao.net"
     fi
 
     # 写入配置文件
-    echo "正在尝试写入配置文件..."
-    wget https://cdn.jsdelivr.net/gh/missuo/XrayR-V2Board/config.yml -O /etc/XrayR/config.yml
+    echo "Yapılandırma dosyası yazmaya çalışılıyor...."
+    wget https://cdn.jsdelivr.net/gh/muzaffer72/XrayR-V2Board/config.yml -O /etc/XrayR/config.yml
     sed -i "s/NodeID:.*/NodeID: ${node_id}/g" /etc/XrayR/config.yml
     sed -i "s/NodeType:.*/NodeType: ${node_type}/g" /etc/XrayR/config.yml
     sed -i "s/CertDomain:.*/CertDomain: \"${node_domain}\"/g" /etc/XrayR/config.yml
     echo ""
-    echo "写入完成，正在尝试重启XrayR服务..."
+    echo "Yazma tamamlandı, XrayR hizmeti yeniden başlatılmaya çalışılıyor..."
     echo
 
 
@@ -237,40 +237,40 @@ install_XrayR() {
 
     systemctl daemon-reload
     XrayR restart
-    echo "正在关闭防火墙！"
+    echo "güvenlik duvarı kapatılıyor！"
     echo
     systemctl disable firewalld
     systemctl stop firewalld
-    echo "XrayR服务已经完成重启，请愉快地享用！"
+    echo "XRAYR Hizmeti yeniden başlatılmıştır, lütfen iyi eğlenceler！"
     echo
 
     cd $cur_dir
     rm -f install.sh
     echo -e ""
-    echo "XrayR 管理脚本使用方法 (兼容使用xrayr执行，大小写不敏感): "
+    echo "Yönetim betiği kullanım yöntemi (xrayr yürütmesiyle uyumlu, büyük/küçük harfe duyarsız): "
     echo "------------------------------------------"
-    echo "XrayR                    - 显示管理菜单 (功能更多)"
-    echo "XrayR start              - 启动 XrayR"
-    echo "XrayR stop               - 停止 XrayR"
-    echo "XrayR restart            - 重启 XrayR"
-    echo "XrayR status             - 查看 XrayR 状态"
-    echo "XrayR enable             - 设置 XrayR 开机自启"
-    echo "XrayR disable            - 取消 XrayR 开机自启"
-    echo "XrayR log                - 查看 XrayR 日志"
-    echo "XrayR update             - 更新 XrayR"
-    echo "XrayR update x.x.x       - 更新 XrayR 指定版本"
-    echo "XrayR config             - 显示配置文件内容"
-    echo "XrayR install            - 安装 XrayR"
-    echo "XrayR uninstall          - 卸载 XrayR"
-    echo "XrayR version            - 查看 XrayR 版本"
+    echo "XrayR                    - Anamenü"
+    echo "XrayR start              - Başlat"
+    echo "XrayR stop               - Durdur"
+    echo "XrayR restart            - Yeniden Başlat"
+    echo "XrayR status             - Durum Sorgula"
+    echo "XrayR enable             - Aktifleştir"
+    echo "XrayR disable            - Pasifleştir"
+    echo "XrayR log                - Log"
+    echo "XrayR update             - Xrayr Güncelle"
+    echo "XrayR update x.x.x       - Belirli sürüme güncelle"
+    echo "XrayR config             - Yapılandırma dosyası içeriğini göster"
+    echo "XrayR install            - Xrayr  Kur"
+    echo "XrayR uninstall          - Xrayr Kaldır"
+    echo "XrayR version            - Version sorgula"
     echo "------------------------------------------"
-    echo "One-Step Script Based on XrayR-Release"
-    echo "Telegram: https://t.me/missuo"
-    echo "Github: https://github.com/missuo/XrayR-V2Board"
-    echo "Powered by Vincent"
+    echo "XrayR Sürümüne Dayalı Tek Adımlı Komut Dosyası"
+    echo "Telegram: https://t.me/shadowsocksvpn"
+    echo "Github: https://github.com/muzaffer72/XrayR-V2Boardson"
+    echo "Powered by Muzaffer Şanlı"
 }
 
-echo -e "${green}开始安装${plain}"
+echo -e "${green}kurulumu başlat${plain}"
 install_base
 # install_acme
 install_XrayR $1
