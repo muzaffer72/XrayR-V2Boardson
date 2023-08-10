@@ -9,7 +9,7 @@ Nodes:
     ApiConfig:
       ApiHost: "https://onvao.net" # 修改这里
       ApiKey: "542734748646690936250" # 修改这里
-      NodeID: 1
+      NodeID: 12
       NodeType: Shadowsocks # Node type: V2ray, Shadowsocks, Trojan
       Timeout: 30 # Timeout for the api request
       EnableVless: false # Enable Vless for V2ray Type, Remote configuration first
